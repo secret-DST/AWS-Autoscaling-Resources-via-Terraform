@@ -3,12 +3,19 @@
 ## Architecture
 <img width="912" height="530" alt="Screenshot 2026-08-14 115934" src="https://github.com/user-attachments/assets/7f19fd4c-e8f9-4f8f-8721-44c1f41fa8c5" />
 
+NOTE: This architecture is duplicated and the CIDR range for the VPC and Subnets differ.
+
 ## Overview
 This project provisions a highly available web application infrastructure on AWS using **Terraform**.
 
 It creates a custom VPC with public subnets across two Availability Zones, an Internet Gateway, security groups, an Application Load Balancer (ALB), and an Auto Scaling Group (ASG) that manages EC2 instances running Apache HTTP Server.
 
 The Application Load Balancer distributes incoming HTTP traffic across EC2 instances, while the Auto Scaling Group maintains the desired number of instances and automatically replaces unhealthy instances.
+
+## Terraform state store
+Since we are working with AWS, we will leverage S3 to store our terraform state file. This is because storing our terraform state file remotely is much more secure than keeping it locally. Human error, accidental deletion are also risks associated with storing it locally. In addition, storing it remotely will enable seamless collaboration as any other entity working on the same terraform project can access it - with the right controls and access.
+
+Previously, DynamoDB was utilised alongside S3 to provide state locking, to prevent concurrent operations, which could result in corrupting the state file. However, terraform has made this process more convenient by providing state locking through "use_lockfile = true" configuration. Therefore, we will only be utilising S3 with the built in configuration, rather than the deprecated DynamoDB method. (The configuration for this process is in backend.tf)
 
 ## Infrastructure Components
 
